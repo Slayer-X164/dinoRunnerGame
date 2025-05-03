@@ -1,6 +1,5 @@
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/Addons.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 const scene = new THREE.Scene()
@@ -22,7 +21,9 @@ scene.add(light, new THREE.AmbientLight(0xffffff, 1))
 
 // Camera
 const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.set(3, 3, 8)
+camera.position.set(2.8, 3, 9)
+camera.rotation.y += 0.4;
+camera.rotation.x += -0.2;
 
 // Renderer
 const canvas = document.querySelector('.webgl_canvas')
@@ -31,8 +32,7 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
@@ -58,6 +58,8 @@ const scoreDisplay = document.querySelector('.score')
 const startBtn = document.querySelector('.start')
 const restartBtn = document.querySelector('.restart')
 const menu = document.querySelector('.menu')
+const jumpBtn = document.querySelector('.jumpBtn')
+
 
 // Load dino
 loader.load('/T-Rex.glb', (gltf) => {
@@ -89,17 +91,34 @@ window.addEventListener('keydown', (e) => {
     velocityY = jumpStrength
   }
 })
-
+jumpBtn.addEventListener('click', () => {
+  if (dino && dino.position.y <= 0.51) {
+    velocityY = jumpStrength;
+  }
+});
+jumpBtn.addEventListener('touchstart', () => {
+  if (dino && dino.position.y <= 0.51) {
+    velocityY = jumpStrength;
+  }
+});
 // Start game
 startBtn.addEventListener('click', () => {
   resetGame()
   menu.style.display = 'none'
+  if(window.innerWidth<=600){
+    jumpBtn.style.display = 'block'
+  }
+
+
 })
 
 // Restart game
 restartBtn.addEventListener('click', () => {
   resetGame()
   restartBtn.style.display = 'none'
+  if(window.innerWidth<=600){
+    jumpBtn.style.display = 'block'
+  }
 })
 
 // Reset game state
@@ -119,7 +138,7 @@ function resetGame() {
 }
 restartBtn.addEventListener('click',()=>{
   console.log('click');
-  
+
   gameOver = false
   gameSpeed = 0.1
   score = 0
@@ -133,6 +152,7 @@ restartBtn.addEventListener('click',()=>{
   }
   obstacles = []
 })
+
 // Animate
 function animate() {
   requestAnimationFrame(animate)
@@ -183,7 +203,7 @@ function animate() {
   score += Math.floor(gameSpeed * 10)
   scoreDisplay.textContent = `Score: ${score}`
 
-  controls.update()
+
   renderer.render(scene, camera)
 }
 animate()
